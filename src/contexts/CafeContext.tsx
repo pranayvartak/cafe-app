@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Table, MenuItem, Order, OrderItem, Bill } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 
+import Category from '../services/category'
+
 interface CafeContextType {
   tables: Table[];
   menuItems: MenuItem[];
@@ -36,10 +38,11 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [bills, setBills] = useState<Bill[]>([]);
-  const [categories, setCategories] = useState<string[]>(['Beverages', 'Food', 'Snacks', 'Desserts']);
+  const [categories, setCategories] = useState<string[]>([]);
 
   // Initialize with sample data
   useEffect(() => {
+    Category.getData().then(x=>{setCategories(x.data.map(y=>y.category))})
     const sampleTables: Table[] = [
       { id: '1', name: 'Table 1', seats: 4, status: 'available' },
       { id: '2', name: 'Table 2', seats: 2, status: 'occupied' },
@@ -49,7 +52,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       { id: '1', name: 'Coffee', price: 120, category: 'Beverages', available: true },
       { id: '2', name: 'Sandwich', price: 180, category: 'Food', available: true },
     ];
-    
+    setCategories(categories)
     setTables(sampleTables);
     setMenuItems(sampleMenuItems);
   }, []);
@@ -90,7 +93,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addCategory = (category: string) => {
     if (!categories.includes(category)) {
-      setCategories(prev => [...prev, category]);
+      // setCategories(prev => [...prev, category]);
+      Category.postData({'category':category}).then(x=>setCategories(prev => [...prev, category]))
       toast({ title: 'Category added successfully' });
     }
   };
