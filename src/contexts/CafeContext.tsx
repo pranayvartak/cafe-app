@@ -3,6 +3,7 @@ import { Table, MenuItem, Order, OrderItem, Bill } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 
 import Category from '../services/category'
+import Item from '../services/item'
 
 interface CafeContextType {
   tables: Table[];
@@ -43,18 +44,23 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Initialize with sample data
   useEffect(() => {
     Category.getData().then(x=>{setCategories(x.data.map(y=>y.category))})
+    Item.getData().then(x => {
+  const items = x.data.map(y => ({...y,id: y._id}));
+  setMenuItems(items);
+});
+
     const sampleTables: Table[] = [
       { id: '1', name: 'Table 1', seats: 4, status: 'available' },
       { id: '2', name: 'Table 2', seats: 2, status: 'occupied' },
     ];
     
-    const sampleMenuItems: MenuItem[] = [
-      { id: '1', name: 'Coffee', price: 120, category: 'Beverages', available: true },
-      { id: '2', name: 'Sandwich', price: 180, category: 'Food', available: true },
-    ];
+    // const sampleMenuItems: MenuItem[] = [
+    //   { id: '1', name: 'Coffee', price: 120, category: 'Beverages', available: true },
+    //   { id: '2', name: 'Sandwich', price: 180, category: 'Food', available: true },
+    // ];
     setCategories(categories)
     setTables(sampleTables);
-    setMenuItems(sampleMenuItems);
+    // setMenuItems(sampleMenuItems);
   }, []);
 
   const addTable = (table: Omit<Table, 'id'>) => {
@@ -70,13 +76,14 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const deleteTable = (id: string) => {
-    setTables(prev => prev.filter(table => table.id !== id));
+setTables(prev => prev.filter(table => table.id !== id))    
     toast({ title: 'Table deleted' });
   };
 
   const addMenuItem = (item: Omit<MenuItem, 'id'>) => {
     const newItem: MenuItem = { ...item, id: Date.now().toString() };
-    setMenuItems(prev => [...prev, newItem]);
+    
+    Item.postData(newItem).then(x=>setMenuItems(prev => [...prev, newItem]))
     toast({ title: 'Menu item added' });
   };
 
@@ -87,7 +94,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const deleteMenuItem = (id: string) => {
-    setMenuItems(prev => prev.filter(item => item.id !== id));
+    Item.deleteData(id).then(x=>setMenuItems(prev => prev.filter(item => item.id !== id)))
+    
     toast({ title: 'Menu item deleted' });
   };
 
