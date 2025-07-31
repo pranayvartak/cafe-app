@@ -21,6 +21,9 @@ class CategoryService{
     deleteData(id){
         return this.http.delete('/item/'+id)
     }
+    putData(id,data){
+        return this.http.put('/item/'+id,data)
+    }
 
 }
 

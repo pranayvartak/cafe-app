@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Table, MenuItem, Order, OrderItem, Bill } from '@/types';
 import { toast } from '@/components/ui/use-toast';
-
 import Category from '../services/category'
 import Item from '../services/item'
+import TableS from '../services/table'
+import { table } from 'console';
+
 
 interface CafeContextType {
   tables: Table[];
@@ -43,40 +45,50 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Initialize with sample data
   useEffect(() => {
+
     Category.getData().then(x=>{setCategories(x.data.map(y=>y.category))})
     Item.getData().then(x => {
   const items = x.data.map(y => ({...y,id: y._id}));
   setMenuItems(items);
+  
+});
+TableS.getData().then(x => {
+  const tables = x.data.map(y => ({...y,id: y._id}));
+  setTables(tables);
 });
 
-    const sampleTables: Table[] = [
-      { id: '1', name: 'Table 1', seats: 4, status: 'available' },
-      { id: '2', name: 'Table 2', seats: 2, status: 'occupied' },
-    ];
+    // const sampleTables: Table[] = [
+    //   { id: '1', name: 'Table 1', seats: 4, status: 'available' },
+    //   { id: '2', name: 'Table 2', seats: 2, status: 'occupied' },
+    // ];
     
     // const sampleMenuItems: MenuItem[] = [
     //   { id: '1', name: 'Coffee', price: 120, category: 'Beverages', available: true },
     //   { id: '2', name: 'Sandwich', price: 180, category: 'Food', available: true },
     // ];
     setCategories(categories)
-    setTables(sampleTables);
+    // setTables(sampleTable);
     // setMenuItems(sampleMenuItems);
   }, []);
 
   const addTable = (table: Omit<Table, 'id'>) => {
     const newTable: Table = { ...table, id: Date.now().toString() };
-    setTables(prev => [...prev, newTable]);
+    // setTables(prev =>   [...prev, newTable]);
+    TableS.postData(newTable).then(x=>setTables(prev => [...prev, newTable ]))
     toast({ title: 'Table added successfully' });
   };
 
   const updateTable = (id: string, updates: Partial<Table>) => {
-    setTables(prev => prev.map(table => 
-      table.id === id ? { ...table, ...updates } : table
-    ));
+    TableS.putData(id,updates).then(x=>setTables(prev => prev.map(table=>table.id ===id ?{...table,...updates}:table)))
+    // setTables(prev => prev.map(table => 
+    //   table.id === id ? { ...table, ...updates } : table
+      
+    // ));
   };
 
   const deleteTable = (id: string) => {
-setTables(prev => prev.filter(table => table.id !== id))    
+// TableS(prev => prev.filter(table => table.id !== id)) 
+TableS.deleteData(id).then(x=>setTables(prev => prev.filter(item => item.id !== id)))   
     toast({ title: 'Table deleted' });
   };
 
@@ -88,9 +100,14 @@ setTables(prev => prev.filter(table => table.id !== id))
   };
 
   const updateMenuItem = (id: string, updates: Partial<MenuItem>) => {
-    setMenuItems(prev => prev.map(item => 
+    // setMenuItems(prev => prev.map(item => 
+    //   item.id === id ? { ...item, ...updates } : item
+    // ));
+
+
+     Item.putData(id,updates).then(x=>setMenuItems(prev => prev.map(item => 
       item.id === id ? { ...item, ...updates } : item
-    ));
+    )))
   };
 
   const deleteMenuItem = (id: string) => {
