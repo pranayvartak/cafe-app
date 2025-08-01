@@ -4,7 +4,7 @@ import { toast } from '@/components/ui/use-toast';
 import Category from '../services/category'
 import Item from '../services/item'
 import TableS from '../services/table'
-import { table } from 'console';
+
 import orderservice from '../services/order'
 import BillS from '../services/bill'
 
@@ -122,6 +122,7 @@ TableS.deleteData(id).then(x=>setTables(prev => prev.filter(item => item.id !== 
      Item.putData(id,updates).then(x=>setMenuItems(prev => prev.map(item => 
       item.id === id ? { ...item, ...updates } : item
     )))
+  
   };
 
   const deleteMenuItem = (id: string) => {
