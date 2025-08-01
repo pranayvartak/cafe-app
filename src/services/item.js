@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 
-class CategoryService{
+class ItemService{
 
     constructor(){
         this.http = axios.create(
@@ -18,6 +18,7 @@ class CategoryService{
     postData(data){
         return this.http.post('/item',data)
     }
+    
     deleteData(id){
         return this.http.delete('/item/'+id)
     }
@@ -25,7 +26,11 @@ class CategoryService{
         return this.http.put('/item/'+id,data)
     }
 
+    putData(id,data){
+        return this.http.put('/item/'+id,data)
+    }
+
 }
 
-let Item = new CategoryService()
+let Item = new ItemService()
 export default Item

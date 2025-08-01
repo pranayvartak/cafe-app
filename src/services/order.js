@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 
-class TableService{
+class CategoryService{
 
     constructor(){
         this.http = axios.create(
@@ -12,21 +12,19 @@ class TableService{
     }
 
     getData(){
-        return this.http.get('/table')
+        return this.http.get('/orders')
     }
 
     postData(data){
-        return this.http.post('/table',data)
+        return this.http.post('/orders',data)
     }
-    
     deleteData(id){
-        return this.http.delete('/table/'+id)
+        return this.http.delete('/orders/'+id)
     }
-
     putData(id,data){
-        return this.http.put('/table/'+id,data)
+        return this.http.put('/orders/'+id,data)
     }
-}
 
-let TableS = new TableService()
-export default TableS
+}
+let order = new CategoryService();
+export default order;
