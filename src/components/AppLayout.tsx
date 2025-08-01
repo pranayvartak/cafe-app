@@ -12,13 +12,17 @@ import BillManagement from './BillManagement';
 
 const AppLayout: React.FC = () => {
   const { toggleSidebar } = useAppContext();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(localStorage.getItem('active') || 'dashboard');
 
   const renderContent = () => {
+   
     switch (activeTab) {
+    
       case 'dashboard':
+
         return <Dashboard />;
       case 'tables':
+
         return <TableManagement />;
       case 'menu':
         return <MenuManagement />;
@@ -29,6 +33,7 @@ const AppLayout: React.FC = () => {
       default:
         return <Dashboard />;
     }
+
   };
 
   return (

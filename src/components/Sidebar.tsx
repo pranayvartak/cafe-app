@@ -109,6 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
                     }`}
                     onClick={() => {
                       setActiveTab(item.id);
+                      localStorage.setItem('active',item.id)
                       if (window.innerWidth < 1024) {
                         toggleSidebar();
                       }

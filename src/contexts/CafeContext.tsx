@@ -5,6 +5,8 @@ import Category from '../services/category'
 import Item from '../services/item'
 import TableS from '../services/table'
 import { table } from 'console';
+import orderservice from '../services/order'
+import BillS from '../services/bill'
 
 
 interface CafeContextType {
@@ -46,6 +48,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Initialize with sample data
   useEffect(() => {
 
+    // BillS.getData().then(x=>{setBills(x.data.map(y=>y.bill))})
     Category.getData().then(x=>{setCategories(x.data.map(y=>y.category))})
     Item.getData().then(x => {
   const items = x.data.map(y => ({...y,id: y._id}));
@@ -54,8 +57,19 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 });
 TableS.getData().then(x => {
   const tables = x.data.map(y => ({...y,id: y._id}));
-  setTables(tables);
+  setTables(tables); 
 });
+BillS.getData().then(x => {
+  const bills = x.data.map(y => ({...y,id: y._id}));
+  setBills(bills); 
+});
+
+
+
+orderservice.getData().then(x=>{
+  const order = x.data.map(y => ({...y,id: y._id}));
+  setOrders(order);
+})
 
     // const sampleTables: Table[] = [
     //   { id: '1', name: 'Table 1', seats: 4, status: 'available' },
@@ -134,15 +148,22 @@ TableS.deleteData(id).then(x=>setTables(prev => prev.filter(item => item.id !== 
       createdAt: new Date(),
       total
     };
-    setOrders(prev => [...prev, newOrder]);
-    updateTable(tableId, { status: 'occupied' });
+    orderservice.postData(newOrder).then(x=>setOrders(prev => [...prev, newOrder]),updateTable(tableId, { status: 'occupied' }))
+    // setOrders(prev => [...prev, newOrder]);
+    // updateTable(tableId, { status: 'occupied' });
     toast({ title: 'Order created' });
   };
 
   const updateOrder = (id: string, updates: Partial<Order>) => {
-    setOrders(prev => prev.map(order => 
+
+    orderservice.putData(id,updates).then(x=>setOrders(prev => prev.map(order => 
       order.id === id ? { ...order, ...updates } : order
-    ));
+    )))
+
+    
+    // setOrders(prev => prev.map(order => 
+    //   order.id === id ? { ...order, ...updates } : order
+    // ));
   };
 
   const addItemsToOrder = (orderId: string, items: OrderItem[]) => {
@@ -160,8 +181,11 @@ TableS.deleteData(id).then(x=>setTables(prev => prev.filter(item => item.id !== 
         });
         
         const newTotal = updatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+       
+        orderservice.putData(orderId, { ...order, items: updatedItems, total: newTotal });
         
         return { ...order, items: updatedItems, total: newTotal };
+        
       }
       return order;
     }));
@@ -187,9 +211,17 @@ TableS.deleteData(id).then(x=>setTables(prev => prev.filter(item => item.id !== 
       createdAt: new Date()
     };
     
-    setBills(prev => [...prev, bill]);
-    updateOrder(orderId, { status: 'completed' });
-    updateTable(order.tableId, { status: 'available' });
+
+    BillS.postData(bill).then(x=>setBills(prev => [...prev, bill])
+    ,updateOrder(orderId, { status: 'completed' })
+    ,updateTable(order.tableId, { status: 'available' }))
+
+    orderservice.deleteData(orderId).then(x=>setOrders(prev => prev.filter(item => item.id !== orderId)))
+
+
+    // setBills(prev => [...prev, bill]);
+    // updateOrder(orderId, { status: 'completed' });
+    // updateTable(order.tableId, { status: 'available' });
     toast({ title: 'Bill generated successfully' });
     
     return bill;
